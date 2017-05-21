@@ -2,8 +2,6 @@ const path = require('path');
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const WebpackOnBuildPlugin = require('on-build-webpack');
-const open = require('open');
 
 const env = process.env.NODE_ENV;
 const isProd = process.env.NODE_ENV === 'prod';
@@ -45,16 +43,6 @@ module.exports = {
         exclude: /\/node_modules\//
       },
       {
-        test: /\.css$/,
-        loader: ExtractTextPlugin.extract('css-loader!postcss-loader'),
-        exclude: /node_modules/
-      },
-      {
-        test: /\.styl$/,
-        loader: ExtractTextPlugin.extract('css-loader!postcss-loader!stylus-loader'),
-        exclude: /node_modules/
-      },
-      {
         test: /\.(jpg|jpeg|png|svg)$/,
         loader: `file-loader?name=images/[name].[hash:8].[ext]`
       },
@@ -87,10 +75,7 @@ module.exports = {
       'process.env': {
         NODE_ENV: JSON.stringify(env)
       }
-    }),
-    // new WebpackOnBuildPlugin(() => {
-    //   open('http://localhost:8080');
-    // }),
+    })
     new ExtractTextPlugin('[name].css'),
   ],
 };
