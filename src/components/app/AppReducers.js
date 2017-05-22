@@ -1,24 +1,19 @@
 import {
+  ADD_CITY,
+  LOAD_SAVED_CITIES,
   GET_CURRENT_CITY_WEATHER,
   SAVE_CITY_WEATHER_BY_NAME,
-  UPDATE_SAVED_CITY_COLLECTION,
   SAVE_CITY_WEATHER_BY_CODE,
-  LOAD_SAVED_CITIES,
+  UPDATE_SAVED_CITY_COLLECTION
 } from './AppActions';
+
+import { convertResponseToCityObject } from '../../common/utils/weatherResponseConvertor';
 
 export function currentCity(state = null, action = {}) {
   switch (action.type) {
     case GET_CURRENT_CITY_WEATHER:
       if (action.response) {
-        return {
-          id: action.response.id,
-          name: action.response.name,
-          coords: action.response.coord,
-          country: action.response.sys.country,
-          temperature: action.response.main.temp,
-          weather: action.response.weather[0].main,
-          weatherDescription: action.response.weather[0].description,
-        };
+        return convertResponseToCityObject(action);
       }
       return state;
     default:
@@ -31,15 +26,7 @@ export function addedCity(state = null, action = {}) {
     case SAVE_CITY_WEATHER_BY_CODE:
     case SAVE_CITY_WEATHER_BY_NAME:
       if (action.response) {
-        return {
-          id: action.response.id,
-          name: action.response.name,
-          coords: action.response.coord,
-          country: action.response.sys.country,
-          temperature: action.response.main.temp,
-          weather: action.response.weather[0].main,
-          weatherDescription: action.response.weather[0].description,
-        };
+        return convertResponseToCityObject(action);
       }
       return state;
     default:
@@ -49,6 +36,14 @@ export function addedCity(state = null, action = {}) {
 
 export function savedCities(state = [], action = {}) {
   switch (action.type) {
+    case ADD_CITY:
+      if (action.payload) {
+        return [
+          ...state,
+          action.payload,
+        ];
+      }
+      break;
     case LOAD_SAVED_CITIES:
       if (action.payload) {
         return action.payload;

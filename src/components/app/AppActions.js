@@ -1,11 +1,19 @@
 import { asyncAction } from '../../common/utils/api';
 import { apiUrl, appID } from '../../../config';
 
+export const ADD_CITY = 'App/addCity';
 export const GET_CURRENT_CITY_WEATHER = 'App/getWeatherByCoords';
 export const SAVE_CITY_WEATHER_BY_NAME = 'App/saveCityWeatherByName';
 export const UPDATE_SAVED_CITY_COLLECTION = 'App/updateSavedCityCollection';
 export const SAVE_CITY_WEATHER_BY_CODE = 'App/saveCityWeatherByCode';
 export const LOAD_SAVED_CITIES = 'App/loadSavedCities';
+
+export function addCity(cityWeatherData) {
+  return {
+    type: ADD_CITY,
+    payload: cityWeatherData,
+  };
+}
 
 export function loadSavedCities(savedCityCollection) {
   return {

@@ -14,7 +14,7 @@ const CitiesWrapper = styled.section`
 const CitiesList = ({ onClickDeleteBtn, cities }) => {
   return (
     <CitiesWrapper>
-      {cities.map(city => <CityCard key={city.id} onClickBtn={onClickDeleteBtn} data={city} />)}
+      {cities.map(city => <CityCard key={city.id} onRemove={onClickDeleteBtn} data={city} />)}
     </CitiesWrapper>
   );
 };

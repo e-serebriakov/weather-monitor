@@ -14,12 +14,8 @@ const Card = styled.div`
   border-radius: 5px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   
-  &:first-child {
+  &:nth-child(3n-2) {
     margin-left: 0;
-  }
-  
-  &:last-child {
-    margin-right: 0;
   }
 `;
 
@@ -80,7 +76,7 @@ const RemoveButton = styled.button`
   }
 `;
 
-const CityCard = ({ onClickBtn, data }) => {
+const CityCard = ({ onRemove, data }) => {
   const {
     id,
     name,
@@ -96,13 +92,13 @@ const CityCard = ({ onClickBtn, data }) => {
       <TemperatureText>{Math.round(temperature)} &#176;C</TemperatureText>
       <WeatherSummary>{weather}</WeatherSummary>
       <WeatherDescription>({weatherDescription})</WeatherDescription>
-      <RemoveButton onClick={onClickBtn} />
+      <RemoveButton onClick={onRemove} />
     </Card>
   );
 };
 
 CityCard.propTypes = {
-  onClickBtn: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
   data: PropTypes.object.isRequired,
 };
 
