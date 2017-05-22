@@ -3,8 +3,8 @@ import { apiUrl, appID } from '../../../config';
 
 export const GET_CURRENT_CITY_WEATHER = 'App/getWeatherByCoords';
 export const SAVE_CITY_WEATHER_BY_NAME = 'App/saveCityWeatherByName';
+export const UPDATE_SAVED_CITY_COLLECTION = 'App/updateSavedCityCollection';
 export const SAVE_CITY_WEATHER_BY_CODE = 'App/saveCityWeatherByCode';
-export const GET_CITY_WEATHER_BY_CODE = 'App/getWeatherByCitiesCode';
 export const LOAD_SAVED_CITIES = 'App/loadSavedCities';
 
 export function loadSavedCities(savedCityCollection) {
@@ -38,9 +38,9 @@ export function saveCityWeatherByCode(cityID) {
   });
 }
 
-export function getWeatherByCitiesCode(IDs) {
+export function updateSavedCityCollection(IDs) {
   return asyncAction({
-    action: GET_CITY_WEATHER_BY_CODE,
+    action: UPDATE_SAVED_CITY_COLLECTION,
     method: 'GET',
     url: `${apiUrl}group?id=${IDs}&units=metric&appid=${appID}`,
   });

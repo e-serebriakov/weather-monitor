@@ -11,8 +11,8 @@ import {
   loadSavedCities,
   getWeatherByCoords,
   saveCityWeatherByName,
+  updateSavedCityCollection,
   saveCityWeatherByCode,
-  getWeatherByCitiesCode,
 } from './AppActions';
 
 /**
@@ -32,7 +32,6 @@ const Wrapper = styled.div`
 
 const ErrorText = styled.p`
   margin-top: 30px;
-  margin-left: 30px;
   color: #fe4a49;
 `;
 
@@ -49,17 +48,29 @@ class App extends Component {
       inputError: false,
     };
 
-    this.addCity = this.addCity.bind(this);
-    this.deleteCityCard = this.deleteCityCard.bind(this);
-    this.handleInputChange = this.handleInputChange.bind(this);
+    this.addCity = this::this.addCity;
+    this.handleInputChange = this::this.deleteCityCard;
+    this.deleteCityCard = this::this.handleInputChange;
   }
 
   componentDidMount() {
     const savedCityCollection = this._getSavedCityCollection();
 
     this.inputElement.focus();
+    this._checkCurrentCityInStorage();
     this._getCurrentPosition();
     this.props.loadSavedCities(savedCityCollection);
+  }
+
+  /**
+   * Check if the current city is in localSorage
+   * @private
+   */
+  _checkCurrentCityInStorage() {
+    const savedCityCollection = this._getSavedCityCollection();
+    const currentPosition = this._getCurrentPosition();
+
+    console.log('_checkCurrentCityInStorage', savedCityCollection, currentPosition);
   }
 
   /**
@@ -68,8 +79,8 @@ class App extends Component {
    */
   _getCurrentPosition() {
     if (navigator.geolocation) {
-      let lat;
-      let lon;
+      var lat;
+      var lon;
 
       navigator.geolocation.getCurrentPosition(
         position => {
@@ -78,11 +89,15 @@ class App extends Component {
 
           this.props.getWeatherByCoords({ lat, lon });
         },
-        () => {
+        (error) => {
+          console.log('_getCurrentPosition', error);
           this.setState({ geoError: true });
         }
       );
+
+      return { lat, lon };
     }
+    this.setState({ geoError: true });
   }
 
   /**
@@ -172,6 +187,7 @@ class App extends Component {
 }
 
 App.propTypes = {
+  addedCity: PropTypes.object,
   currentCity: PropTypes.object,
   savedCities: PropTypes.array,
   loadSavedCities: PropTypes.func.isRequired,
@@ -182,12 +198,14 @@ App.propTypes = {
 };
 
 App.defaultProps = {
+  addedCity: null,
   currentCity: null,
   savedCities: [],
 };
 
 export default connect(
   state => ({
+    addedCity: state.addedCity,
     savedCities: state.savedCities,
     currentCity: state.currentCity,
   }),

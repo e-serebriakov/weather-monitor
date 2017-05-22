@@ -53,7 +53,7 @@ const AddForm = ({ inputError, onClickBtn, onInputChange, inputValue, inputRef }
     <Form>
       <Input
         type="text"
-        placeholder="write city name or code"
+        placeholder="input city name or code"
         value={inputValue}
         onChange={onInputChange}
         innerRef={inputRef}

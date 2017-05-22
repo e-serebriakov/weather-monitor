@@ -1,8 +1,8 @@
 import {
   GET_CURRENT_CITY_WEATHER,
   SAVE_CITY_WEATHER_BY_NAME,
+  UPDATE_SAVED_CITY_COLLECTION,
   SAVE_CITY_WEATHER_BY_CODE,
-  GET_CITY_WEATHER_BY_CODE,
   LOAD_SAVED_CITIES,
 } from './AppActions';
 
@@ -13,6 +13,7 @@ export function currentCity(state = null, action = {}) {
         return {
           id: action.response.id,
           name: action.response.name,
+          coords: action.response.coord,
           country: action.response.sys.country,
           temperature: action.response.main.temp,
           weather: action.response.weather[0].main,
@@ -25,40 +26,41 @@ export function currentCity(state = null, action = {}) {
   }
 }
 
-export function savedCities(state = [], action = {}) {
-  const savedCityCollection = JSON.parse(localStorage.getItem('savedCities')) || [];
+export function addedCity(state = null, action = {}) {
   switch (action.type) {
-    case LOAD_SAVED_CITIES:
-      if (action.payload) {
-        return action.payload;
-      }
-      break;
-    case SAVE_CITY_WEATHER_BY_NAME:
     case SAVE_CITY_WEATHER_BY_CODE:
+    case SAVE_CITY_WEATHER_BY_NAME:
       if (action.response) {
-        const cityData = {
+        return {
           id: action.response.id,
           name: action.response.name,
+          coords: action.response.coord,
           country: action.response.sys.country,
           temperature: action.response.main.temp,
           weather: action.response.weather[0].main,
           weatherDescription: action.response.weather[0].description,
         };
-        const newCityCollection = savedCityCollection.concat(cityData);
+      }
+      break;
+    default:
+      return state;
+  }
+}
 
-        localStorage.setItem('savedCities', JSON.stringify(newCityCollection));
-        return [
-          ...state,
-          cityData,
-        ];
+export function savedCities(state = [], action = {}) {
+  switch (action.type) {
+    case LOAD_SAVED_CITIES:
+      if (action.payload) {
+        return action.payload;
       }
       return state;
-    case GET_CITY_WEATHER_BY_CODE:
+    case UPDATE_SAVED_CITY_COLLECTION:
       if (action.response) {
         return action.response.list.map(city => {
           return {
             id: city.id,
             name: city.name,
+            coords: city.coord,
             country: city.sys.country,
             temperature: city.main.temp,
             weather: city.weather[0].main,
@@ -66,7 +68,7 @@ export function savedCities(state = [], action = {}) {
           };
         });
       }
-      return state;
+      break;
     default:
       return state;
   }

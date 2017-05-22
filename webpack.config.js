@@ -8,7 +8,7 @@ const isProd = process.env.NODE_ENV === 'prod';
 const isDev = !isProd;
 
 function getDevtool() {
-  const devtool = 'source-map';
+  let devtool = 'source-map';
   if (isProd) {
     devtool = null;
   }

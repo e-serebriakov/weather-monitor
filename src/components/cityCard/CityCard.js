@@ -5,7 +5,7 @@ import styled from 'styled-components';
 const Card = styled.div`
   position: relative;
   width: 320px;
-  margin: 30px;
+  margin: 30px 15px;
   padding: 20px;
   font-size: 1em;
   text-align: center;
