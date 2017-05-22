@@ -27,16 +27,17 @@ const CityText = styled.h3`
   margin-bottom: 20px;
 `;
 
-const WeatherText = styled.p`
-`;
-
 const TemperatureText = styled.span`
   display: inline-block;
   margin-right: 10px;
   font-size: 2em;
 `;
 
-const WeatherDescription = styled.span`
+const WeatherSummary = styled.span`
+  font-size: 1.5em;
+`;
+
+const WeatherDescription = styled.p`
 `;
 
 const RemoveButton = styled.button`
@@ -92,10 +93,9 @@ const CityCard = ({ onClickBtn, data }) => {
   return (
     <Card data-id={id}>
       <CityText>{name} ({country})</CityText>
-      <WeatherText>
-        <TemperatureText>{Math.round(temperature)} &#176;C</TemperatureText>
-        <WeatherDescription>{weather} ({weatherDescription})</WeatherDescription>
-      </WeatherText>
+      <TemperatureText>{Math.round(temperature)} &#176;C</TemperatureText>
+      <WeatherSummary>{weather}</WeatherSummary>
+      <WeatherDescription>({weatherDescription})</WeatherDescription>
       <RemoveButton onClick={onClickBtn} />
     </Card>
   );

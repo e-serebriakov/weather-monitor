@@ -41,7 +41,7 @@ export function addedCity(state = null, action = {}) {
           weatherDescription: action.response.weather[0].description,
         };
       }
-      break;
+      return state;
     default:
       return state;
   }
@@ -68,7 +68,7 @@ export function savedCities(state = [], action = {}) {
           };
         });
       }
-      break;
+      return state;
     default:
       return state;
   }

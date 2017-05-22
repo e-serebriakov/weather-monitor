@@ -49,17 +49,45 @@ class App extends Component {
     };
 
     this.addCity = this::this.addCity;
-    this.handleInputChange = this::this.deleteCityCard;
-    this.deleteCityCard = this::this.handleInputChange;
+    this.handleInputChange = this::this.handleInputChange ;
+    this.deleteCityCard = this::this.deleteCityCard;
   }
 
   componentDidMount() {
     const savedCityCollection = this._getSavedCityCollection();
 
+    console.log('savedCityCollection', savedCityCollection);
+
+    if (savedCityCollection.length) {
+      const citiesIds = this._getSavedCitiesIds(savedCityCollection);
+      this.props.updateSavedCityCollection(citiesIds);
+      this._setSavedCityCollection(this.props.savedCities);
+      console.log('citiesIds', citiesIds);
+    }
+
     this.inputElement.focus();
     this._checkCurrentCityInStorage();
     this._getCurrentPosition();
     this.props.loadSavedCities(savedCityCollection);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log('componentWillReceiveProps', nextProps);
+
+    if (nextProps.addedCity) {
+      const cityCollection = this._getSavedCityCollection();
+      this._addCityToStorage(nextProps.addedCity, cityCollection);
+      this.props.loadSavedCities(filteredCityCollection);
+    }
+  }
+
+  /**
+   * Get saved cities IDs
+   * @param cities
+   * @private
+   */
+  _getSavedCitiesIds(cities) {
+    return cities.map(city => city.id);
   }
 
   /**
@@ -100,12 +128,21 @@ class App extends Component {
     this.setState({ geoError: true });
   }
 
+  _addCityToStorage(newCity, savedCities = []) {
+    const updatedCollection = savedCities.concat(newCity);
+    localStorage.setItem('savedCities', JSON.stringify(updatedCollection));
+  }
+
   /**
    * Get saved cities from localStorage
    * @private
    */
   _getSavedCityCollection() {
-    return JSON.parse(localStorage.getItem('savedCities'));
+    return JSON.parse(localStorage.getItem('savedCities')) || [];
+  }
+
+  _setSavedCityCollection(cities) {
+    localStorage.setItem('savedCities', JSON.stringify(cities));
   }
 
   handleInputChange(event) {
@@ -180,6 +217,7 @@ class App extends Component {
             <CitiesList cities={cities} onClickDeleteBtn={this.deleteCityCard} /> :
             geoError && <ErrorText>Location error (try enable geo or try later)</ErrorText>
         }
+        { geoError && <ErrorText>Location error (try enable geo or try later)</ErrorText> }
         {shouldShowDevTools && <DevTools />}
       </Wrapper>
     );
@@ -195,6 +233,7 @@ App.propTypes = {
   saveCityWeatherByName: PropTypes.func.isRequired,
   saveCityWeatherByCode: PropTypes.func.isRequired,
   getWeatherByCitiesCode: PropTypes.func.isRequired,
+  updateSavedCityCollection: PropTypes.func.isRequired,
 };
 
 App.defaultProps = {
@@ -219,8 +258,11 @@ export default connect(
     saveCityWeatherByCode(cityID) {
       dispatch(saveCityWeatherByCode(cityID));
     },
-    getWeatherByCitiesCode(IDs) {
-      dispatch(getWeatherByCitiesCode(IDs));
+    getWeatherByCitiesCode(ID) {
+      dispatch(getWeatherByCitiesCode(ID));
+    },
+    updateSavedCityCollection(IDs) {
+      dispatch(updateSavedCityCollection(IDs))
     },
     loadSavedCities(savedCityCollection) {
       dispatch(loadSavedCities(savedCityCollection));
