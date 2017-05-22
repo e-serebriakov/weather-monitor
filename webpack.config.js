@@ -75,7 +75,7 @@ module.exports = {
       'process.env': {
         NODE_ENV: JSON.stringify(env)
       }
-    })
+    }),
     new ExtractTextPlugin('[name].css'),
   ],
 };
