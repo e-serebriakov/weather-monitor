@@ -37,7 +37,6 @@ const TemperatureText = styled.span`
 `;
 
 const WeatherDescription = styled.span`
-  
 `;
 
 const RemoveButton = styled.button`
