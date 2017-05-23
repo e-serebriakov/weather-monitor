@@ -8,7 +8,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:dev": "webpack && node staticServer.js",
+    "build:dev": "export NODE_ENV=dev; webpack && node staticServer.js",
+    "build:prod": "export NODE_ENV=prod; webpack && node staticServer.js",
     "staticServer:dev": "node staticServer.js",
     "static:watch": "webpack --watch --progress",
     "jslint": "eslint --color './src/**/*.js'"
@@ -57,6 +58,7 @@
     "eslint-plugin-react": "^5.2.2",
     "extract-text-webpack-plugin": "^2.1.0",
     "file-loader": "^0.11.1",
-    "node-static": "^0.7.9"
+    "node-static": "^0.7.9",
+    "uglifyjs-webpack-plugin": "^0.4.3"
   }
 }
