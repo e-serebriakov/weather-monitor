@@ -11,5 +11,5 @@ not working [demo](https://e-serebriakov.github.io/) :(
  
 #### current problems
 * no loader for slow internet connection
-* api problems with https (especially on producion)
+* api problems with https (especially on production - not working)
 * no uglify-plugin for production
