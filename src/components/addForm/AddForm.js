@@ -6,7 +6,6 @@ import { addBtnShake } from '../../common/styles/keyframes';
 
 const Form = styled.form`
   position: relative;
-  width: 495px;
   margin-bottom: 10px;
 `;
 
@@ -59,7 +58,7 @@ const AddForm = ({ inputError, onClickBtn, onInputChange, inputValue, inputRef }
         innerRef={inputRef}
         inputError={inputError}
       />
-      {inputError && <ErrorText>Enter city name with country code or city code</ErrorText>}
+      {inputError && <ErrorText>Enter city name (example: Moscow, ru) with country code or city code (example: 2172797)</ErrorText>}
       <Button onClick={onClickBtn}>Add city</Button>
     </Form>
   );

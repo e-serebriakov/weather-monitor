@@ -12,10 +12,9 @@ import {
   addCity,
   loadSavedCities,
   getWeatherByCoords,
-  saveCityWeatherByName,
+  saveCityWeatherByCityName,
   updateSavedCityCollection,
   saveCityWeatherByCode,
-  getWeatherByCitiesCode,
 } from './AppActions';
 
 /**
@@ -82,7 +81,7 @@ class App extends Component {
 
     this.isCurrentCityInStorage(savedCityCollection)
       .then(result => {
-        if (!result.isCityInStorage) {
+        if (result && !result.isCityInStorage) {
           this.props.getWeatherByCoords({
             lat: result.currentPosition.coords.latitude.toFixed(1),
             lon: result.currentPosition.coords.longitude.toFixed(1),
@@ -95,7 +94,7 @@ class App extends Component {
               App.addCityToStorage(currentCity, savedCityCollection);
             });
         }
-
+        this.setState({ geoError: false });
       });
   }
 
@@ -137,7 +136,10 @@ class App extends Component {
           currentPosition,
         }
       })
-      .catch(error => console.log('isCurrentCityInStorage', error));
+      .catch(error => {
+        this.setState({ geoError: true });
+        console.log('isCurrentCityInStorage', error);
+      });
   }
 
   /**
@@ -211,7 +213,7 @@ class App extends Component {
     }
     const cityName = cityDataArray[0].trim();
     const countryCode = cityDataArray[1].trim();
-    this.props.saveCityWeatherByName({ cityName, countryCode })
+    this.props.saveCityWeatherByCityName({ cityName, countryCode })
       .then((response) => {
         const addedCity = convertResponseToCityObject(response);
         this.props.loadSavedCities(this.props.savedCities.concat(addedCity));
@@ -251,12 +253,12 @@ class App extends Component {
           inputValue={this.state.inputValue}
           inputRef={input => this.inputElement = input}
         />
+        {geoError && <ErrorText>Location error (try enable geo or try later)</ErrorText>}
         {
           savedCities && savedCities.length ?
             <CitiesList cities={savedCities} onClickDeleteBtn={this.deleteCityCard} /> :
-            geoError && <ErrorText>Location error (try enable geo or try later)</ErrorText>
+            null
         }
-        { geoError && <ErrorText>Location error (try enable geo or try later)</ErrorText> }
         {shouldShowDevTools && <DevTools />}
       </Wrapper>
     );
@@ -270,9 +272,8 @@ App.propTypes = {
   addCity: PropTypes.func.isRequired,
   loadSavedCities: PropTypes.func.isRequired,
   getWeatherByCoords: PropTypes.func.isRequired,
-  saveCityWeatherByName: PropTypes.func.isRequired,
+  saveCityWeatherByCityName: PropTypes.func.isRequired,
   saveCityWeatherByCode: PropTypes.func.isRequired,
-  getWeatherByCitiesCode: PropTypes.func.isRequired,
   updateSavedCityCollection: PropTypes.func.isRequired,
 };
 
@@ -295,14 +296,11 @@ export default connect(
     getWeatherByCoords(coords) {
       return dispatch(getWeatherByCoords(coords));
     },
-    saveCityWeatherByName(data) {
-      return dispatch(saveCityWeatherByName(data));
+    saveCityWeatherByCityName(data) {
+      return dispatch(saveCityWeatherByCityName(data));
     },
     saveCityWeatherByCode(cityID) {
       return dispatch(saveCityWeatherByCode(cityID));
-    },
-    getWeatherByCitiesCode(IDs) {
-      dispatch(getWeatherByCitiesCode(IDs));
     },
     updateSavedCityCollection(IDs) {
       dispatch(updateSavedCityCollection(IDs))

@@ -2,7 +2,7 @@ import {
   ADD_CITY,
   LOAD_SAVED_CITIES,
   GET_CURRENT_CITY_WEATHER,
-  SAVE_CITY_WEATHER_BY_NAME,
+  SAVE_CITY_WEATHER_BY_CITY_NAME,
   SAVE_CITY_WEATHER_BY_CODE,
   UPDATE_SAVED_CITY_COLLECTION
 } from './AppActions';
@@ -24,7 +24,7 @@ export function currentCity(state = null, action = {}) {
 export function addedCity(state = null, action = {}) {
   switch (action.type) {
     case SAVE_CITY_WEATHER_BY_CODE:
-    case SAVE_CITY_WEATHER_BY_NAME:
+    case SAVE_CITY_WEATHER_BY_CITY_NAME:
       if (action.response) {
         return convertResponseToCityObject(action);
       }
