@@ -5,3 +5,4 @@
     npm i
     npm run build:dev
 ```
+open localhost:8080
