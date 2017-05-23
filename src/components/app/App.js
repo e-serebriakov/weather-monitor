@@ -6,11 +6,13 @@ import styled, { injectGlobal } from 'styled-components';
 import AddForm from '../addForm/AddForm';
 import CitiesList from '../citiesList/CitiesList';
 import DevTools from '../../common/DevTools';
+import { convertResponseToCityObject } from '../../common/utils/weatherResponseConvertor';
 import { resetStyles, styleGlobally } from './AppStyles';
 import {
+  addCity,
   loadSavedCities,
   getWeatherByCoords,
-  saveCityWeatherByName,
+  saveCityWeatherByCityName,
   updateSavedCityCollection,
   saveCityWeatherByCode,
 } from './AppActions';
@@ -53,32 +55,47 @@ class App extends Component {
     this.deleteCityCard = this::this.deleteCityCard;
   }
 
+  /**
+   * Return localStorage key
+   * @return {string}
+   */
+  static get localStorageKey() {
+    return 'savedCities';
+  }
+
+  /**
+   * @inheritDoc
+   */
   componentDidMount() {
-    const savedCityCollection = this._getSavedCityCollection();
-
-    console.log('savedCityCollection', savedCityCollection);
-
-    if (savedCityCollection.length) {
-      const citiesIds = this._getSavedCitiesIds(savedCityCollection);
+    const savedCityCollection = App.getSavedCityCollection();
+    if (savedCityCollection && savedCityCollection.length) {
+      const citiesIds = App.getSavedCitiesIds(savedCityCollection);
       this.props.updateSavedCityCollection(citiesIds);
-      this._setSavedCityCollection(this.props.savedCities);
-      console.log('citiesIds', citiesIds);
     }
 
     this.inputElement.focus();
-    this._checkCurrentCityInStorage();
-    this._getCurrentPosition();
-    this.props.loadSavedCities(savedCityCollection);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    console.log('componentWillReceiveProps', nextProps);
-
-    if (nextProps.addedCity) {
-      const cityCollection = this._getSavedCityCollection();
-      this._addCityToStorage(nextProps.addedCity, cityCollection);
-      this.props.loadSavedCities(filteredCityCollection);
+    if (!navigator.geolocation) {
+      this.setState({ geoError: true });
+      return;
     }
+
+    this.isCurrentCityInStorage(savedCityCollection)
+      .then(result => {
+        if (result && !result.isCityInStorage) {
+          this.props.getWeatherByCoords({
+            lat: result.currentPosition.coords.latitude.toFixed(1),
+            lon: result.currentPosition.coords.longitude.toFixed(1),
+          })
+            .then(response => {
+              const savedCityCollection = App.getSavedCityCollection();
+              const currentCity = convertResponseToCityObject(response);
+
+              this.props.addCity(currentCity);
+              App.addCityToStorage(currentCity, savedCityCollection);
+            });
+          this.setState({ geoError: false });
+        }
+      });
   }
 
   /**
@@ -86,63 +103,75 @@ class App extends Component {
    * @param cities
    * @private
    */
-  _getSavedCitiesIds(cities) {
+  static getSavedCitiesIds(cities) {
     return cities.map(city => city.id);
   }
 
   /**
    * Check if the current city is in localSorage
-   * @private
    */
-  _checkCurrentCityInStorage() {
-    const savedCityCollection = this._getSavedCityCollection();
-    const currentPosition = this._getCurrentPosition();
+  isCurrentCityInStorage(cityCollection) {
+    return this.getCurrentPosition()
+      .then(currentPosition => {
+        const currentCityPosition = {
+          lat: parseFloat(currentPosition.coords.latitude.toFixed(1)),
+          lon: parseFloat(currentPosition.coords.longitude.toFixed(1)),
+        };
 
-    console.log('_checkCurrentCityInStorage', savedCityCollection, currentPosition);
+        if (!cityCollection || !cityCollection.length) {
+          return {
+            isCityInStorage: false,
+            currentPosition,
+          }
+        }
+
+        const isCityInStorage = cityCollection.some(city => {
+          return city.coords.lat === currentCityPosition.lat &&
+            city.coords.lon === currentCityPosition.lon;
+        });
+
+        return {
+          isCityInStorage,
+          currentPosition,
+        }
+      })
+      .catch(error => {
+        this.setState({ geoError: true });
+        console.log('Geo error', error);
+      });
   }
 
   /**
    * Get user navigator coordinates
-   * @private
    */
-  _getCurrentPosition() {
-    if (navigator.geolocation) {
-      var lat;
-      var lon;
-
+  getCurrentPosition() {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error());
+      }
       navigator.geolocation.getCurrentPosition(
-        position => {
-          lat = (position.coords.latitude).toFixed(1);
-          lon = (position.coords.longitude).toFixed(1);
-
-          this.props.getWeatherByCoords({ lat, lon });
-        },
-        (error) => {
-          console.log('_getCurrentPosition', error);
-          this.setState({ geoError: true });
-        }
+        coords => resolve(coords),
+        error => reject(error)
       );
-
-      return { lat, lon };
-    }
-    this.setState({ geoError: true });
+    });
   }
 
-  _addCityToStorage(newCity, savedCities = []) {
+  /**
+   * Add city to localStorage
+   * @param newCity
+   * @param savedCities
+   */
+  static addCityToStorage(newCity, savedCities) {
+    savedCities = savedCities || [];
     const updatedCollection = savedCities.concat(newCity);
-    localStorage.setItem('savedCities', JSON.stringify(updatedCollection));
+    localStorage.setItem(App.localStorageKey, JSON.stringify(updatedCollection));
   }
 
   /**
    * Get saved cities from localStorage
-   * @private
    */
-  _getSavedCityCollection() {
-    return JSON.parse(localStorage.getItem('savedCities')) || [];
-  }
-
-  _setSavedCityCollection(cities) {
-    localStorage.setItem('savedCities', JSON.stringify(cities));
+  static getSavedCityCollection() {
+    return JSON.parse(localStorage.getItem(App.localStorageKey));
   }
 
   handleInputChange(event) {
@@ -154,18 +183,25 @@ class App extends Component {
     });
   }
 
+  /**
+   * Add new city
+   * @param event
+   */
   addCity(event) {
     event.preventDefault();
+    const savedCityCollection = App.getSavedCityCollection();
     const inputValue = this.state.inputValue;
-
     if (!this.state.inputValue.trim()) {
       this.setState({ inputError: true });
       return;
     }
 
     if (!(isNaN(parseInt(inputValue, 10)))) {
-      console.log('addCity number', inputValue);
-      this.props.saveCityWeatherByCode(inputValue);
+      this.props.saveCityWeatherByCode(inputValue).then((response) => {
+        const addedCity = convertResponseToCityObject(response);
+        this.props.loadSavedCities(this.props.savedCities.concat(addedCity));
+        App.addCityToStorage(addedCity, savedCityCollection);
+      });
       return;
     }
 
@@ -176,7 +212,12 @@ class App extends Component {
     }
     const cityName = cityDataArray[0].trim();
     const countryCode = cityDataArray[1].trim();
-    this.props.saveCityWeatherByName({ cityName, countryCode });
+    this.props.saveCityWeatherByCityName({ cityName, countryCode })
+      .then((response) => {
+        const addedCity = convertResponseToCityObject(response);
+        this.props.loadSavedCities(this.props.savedCities.concat(addedCity));
+        App.addCityToStorage(addedCity, savedCityCollection);
+      });
     this.setState({ inputValue: '' });
   }
 
@@ -187,12 +228,12 @@ class App extends Component {
   deleteCityCard(event) {
     const cityElement = event.target.closest('div');
     const cityID = cityElement.getAttribute('data-id');
-    const savedCityCollection = this._getSavedCityCollection();
+    const savedCityCollection = App.getSavedCityCollection();
     const filteredCityCollection = savedCityCollection.filter(city => {
       return parseInt(city.id, 10) !== parseInt(cityID, 10);
     });
 
-    localStorage.setItem('savedCities', JSON.stringify(filteredCityCollection));
+    localStorage.setItem(App.localStorageKey, JSON.stringify(filteredCityCollection));
 
     this.props.loadSavedCities(filteredCityCollection);
   }
@@ -200,8 +241,7 @@ class App extends Component {
   render() {
     const shouldShowDevTools = WP_IS_DEV;
     const { geoError, inputError } = this.state;
-    const { currentCity, savedCities } = this.props;
-    const cities = currentCity ? savedCities.concat(currentCity) : savedCities;
+    const { savedCities } = this.props;
 
     return (
       <Wrapper>
@@ -212,12 +252,12 @@ class App extends Component {
           inputValue={this.state.inputValue}
           inputRef={input => this.inputElement = input}
         />
+        {geoError && <ErrorText>Location error (try enable geo or try later)</ErrorText>}
         {
-          cities && cities.length ?
-            <CitiesList cities={cities} onClickDeleteBtn={this.deleteCityCard} /> :
-            geoError && <ErrorText>Location error (try enable geo or try later)</ErrorText>
+          savedCities && savedCities.length ?
+            <CitiesList cities={savedCities} onClickDeleteBtn={this.deleteCityCard} /> :
+            null
         }
-        { geoError && <ErrorText>Location error (try enable geo or try later)</ErrorText> }
         {shouldShowDevTools && <DevTools />}
       </Wrapper>
     );
@@ -226,13 +266,13 @@ class App extends Component {
 
 App.propTypes = {
   addedCity: PropTypes.object,
-  currentCity: PropTypes.object,
   savedCities: PropTypes.array,
+  currentCity: PropTypes.object,
+  addCity: PropTypes.func.isRequired,
   loadSavedCities: PropTypes.func.isRequired,
   getWeatherByCoords: PropTypes.func.isRequired,
-  saveCityWeatherByName: PropTypes.func.isRequired,
+  saveCityWeatherByCityName: PropTypes.func.isRequired,
   saveCityWeatherByCode: PropTypes.func.isRequired,
-  getWeatherByCitiesCode: PropTypes.func.isRequired,
   updateSavedCityCollection: PropTypes.func.isRequired,
 };
 
@@ -249,17 +289,17 @@ export default connect(
     currentCity: state.currentCity,
   }),
   dispatch => ({
-    getWeatherByCoords(coords) {
-      dispatch(getWeatherByCoords(coords));
+    addCity(cityWeatherData) {
+      dispatch(addCity(cityWeatherData));
     },
-    saveCityWeatherByName(data) {
-      dispatch(saveCityWeatherByName(data));
+    getWeatherByCoords(coords) {
+      return dispatch(getWeatherByCoords(coords));
+    },
+    saveCityWeatherByCityName(data) {
+      return dispatch(saveCityWeatherByCityName(data));
     },
     saveCityWeatherByCode(cityID) {
-      dispatch(saveCityWeatherByCode(cityID));
-    },
-    getWeatherByCitiesCode(ID) {
-      dispatch(getWeatherByCitiesCode(ID));
+      return dispatch(saveCityWeatherByCode(cityID));
     },
     updateSavedCityCollection(IDs) {
       dispatch(updateSavedCityCollection(IDs))
