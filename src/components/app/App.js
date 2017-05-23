@@ -93,8 +93,8 @@ class App extends Component {
               this.props.addCity(currentCity);
               App.addCityToStorage(currentCity, savedCityCollection);
             });
+          this.setState({ geoError: false });
         }
-        this.setState({ geoError: false });
       });
   }
 
@@ -113,7 +113,6 @@ class App extends Component {
   isCurrentCityInStorage(cityCollection) {
     return this.getCurrentPosition()
       .then(currentPosition => {
-
         const currentCityPosition = {
           lat: parseFloat(currentPosition.coords.latitude.toFixed(1)),
           lon: parseFloat(currentPosition.coords.longitude.toFixed(1)),
@@ -138,7 +137,7 @@ class App extends Component {
       })
       .catch(error => {
         this.setState({ geoError: true });
-        console.log('isCurrentCityInStorage', error);
+        console.log('Geo error', error);
       });
   }
 
