@@ -1,7 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 const env = process.env.NODE_ENV;
@@ -27,15 +26,14 @@ function getPlugins() {
       WP_NODE_ENV: JSON.stringify(env),
       WP_IS_DEV: isDev,
       'process.env': {
-        NODE_ENV: JSON.stringify(env)
+        NODE_ENV: JSON.stringify('production')
       }
     }),
-    new ExtractTextPlugin('[name].css'),
   ];
 
   if (isProd) {
     plugins.push(
-      new webpack.optimize.UglifyJsPlugin()
+      new UglifyJSPlugin()
     );
   }
 
