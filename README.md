@@ -7,7 +7,7 @@
 ```
 open localhost:8080
 
-not working [demo](https://e-serebriakov.github.io/) :(
+[demo](https://e-serebriakov.github.io/)
  
 #### current problems
 * no loader for slow internet connection
