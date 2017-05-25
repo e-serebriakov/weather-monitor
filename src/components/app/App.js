@@ -26,15 +26,26 @@ injectGlobal`
 `;
 
 const Wrapper = styled.div`
+  min-width: 360px;
   max-width: 1150px;
   margin: 0 auto;
   padding: 50px 0 30px;
+  text-align: center;
   background-color: transparent;
+
+  @media (max-width: 730px) {
+    padding: 20px 15px;
+  }
 `;
 
 const ErrorText = styled.p`
   margin-top: 30px;
   color: #fe4a49;
+
+  @media (min-width: 730px) {
+    margin-left: 10px;
+    text-align: left;
+  }
 `;
 
 /**

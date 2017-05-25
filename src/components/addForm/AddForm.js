@@ -6,12 +6,17 @@ import { addBtnShake } from '../../common/styles/keyframes';
 
 const Form = styled.form`
   position: relative;
-  margin-bottom: 10px;
+  margin-bottom: 50px;
+
+  @media (min-width: 730px) {
+    margin-left: 10px;
+    text-align: left;
+  }
 `;
 
 const Input = styled.input`
   height: 40px;
-  width: 323px;
+  width: 220px;
   margin-right: 10px;
   padding: 0 10px;
   font-size: 1em;
@@ -28,6 +33,7 @@ const ErrorText = styled.p`
   position: absolute;
   top: 100%;
   left: 0;
+  font-size: 0.85em;
   color: #fe4a49;
 `;
 

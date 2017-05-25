@@ -4,8 +4,8 @@ import styled from 'styled-components';
 
 const Card = styled.div`
   position: relative;
-  width: 320px;
-  margin: 30px 15px;
+  width: 325px;
+  margin: 10px 0;
   padding: 20px;
   font-size: 1em;
   text-align: center;
@@ -13,9 +13,9 @@ const Card = styled.div`
   background-color: white;
   border-radius: 5px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-  
-  &:nth-child(3n-2) {
-    margin-left: 0;
+  @media (min-width: 685px) {
+    margin-right: 10px;
+    margin-left: 10px;
   }
 `;
 
@@ -48,11 +48,11 @@ const RemoveButton = styled.button`
   background-color: transparent;
   cursor: pointer;
   transition: background-color .2 linear;
-  
+
   &:hover {
     background-color: #d2d2d2;
   }
-  
+
   &:before,
   &:after {
     position: absolute;
@@ -64,12 +64,12 @@ const RemoveButton = styled.button`
     background-color: #fe4a49;
     border-radius: 1px;
   }
-    
+
   &:before {
     left: 4px;
     transform: rotate(45deg);
   }
-  
+
   &:after {
     right: 4px;
     transform: rotate(-45deg);

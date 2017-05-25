@@ -7,8 +7,12 @@ import CityCard from '../cityCard/CityCard';
 const CitiesWrapper = styled.section`
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  justify-content:center;
   align-items: center;
+
+  @media (min-width: 730px) {
+    justify-content: flex-start;
+  }
 `;
 
 const CitiesList = ({ onClickDeleteBtn, cities }) => {
