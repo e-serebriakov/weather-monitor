@@ -11,4 +11,3 @@ open localhost:8080
  
 #### current problems
 * no loader for slow internet connection
-* api problems with https (especially on production - not working)
