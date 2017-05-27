@@ -213,6 +213,7 @@ class App extends Component {
         this.props.loadSavedCities(this.props.savedCities.concat(addedCity));
         App.addCityToStorage(addedCity, savedCityCollection);
       });
+      this.setState({ inputValue: '' });
       return;
     }
 
