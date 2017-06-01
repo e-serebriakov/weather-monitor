@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { addBtnShake } from '../../common/styles/keyframes';
+import { addBtnShake } from './styles/keyframes';
 
 const Form = styled.form`
   position: relative;
@@ -64,13 +64,18 @@ const AddForm = ({ inputError, onClickBtn, onInputChange, inputValue, inputRef }
         innerRef={inputRef}
         inputError={inputError}
       />
-      {inputError && <ErrorText>Enter city name (example: Moscow, ru) with country code or city code (example: 2172797)</ErrorText>}
+      {inputError &&
+        <ErrorText>
+          Enter city name (example: Moscow, ru) with country code or city code (example: 2172797)
+        </ErrorText>}
       <Button onClick={onClickBtn}>Add city</Button>
     </Form>
   );
 };
 
 AddForm.propTypes = {
+  inputRef: PropTypes.node.isRequired,
+  inputError: PropTypes.bool.isRequired,
   onClickBtn: PropTypes.func.isRequired,
   onInputChange: PropTypes.func.isRequired,
   inputValue: PropTypes.string.isRequired,

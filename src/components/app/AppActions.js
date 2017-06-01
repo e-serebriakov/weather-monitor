@@ -47,6 +47,9 @@ export function saveCityWeatherByCode(cityID) {
 }
 
 export function updateSavedCityCollection(IDs) {
+
+    console.debug(' updateSavedCityCollection', IDs);
+
   return asyncAction({
     action: UPDATE_SAVED_CITY_COLLECTION,
     method: 'GET',

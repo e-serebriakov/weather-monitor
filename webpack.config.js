@@ -75,10 +75,6 @@ module.exports = {
         test: /\.(woff|woff2|ttf)$/,
         loader: `file-loader?name=fonts/[name].[hash:8].[ext]`
       },
-      {
-        test: /\.json$/,
-        use: 'json-loader'
-      }
     ]
   },
 
