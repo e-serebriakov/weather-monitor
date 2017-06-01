@@ -15,5 +15,5 @@ const addBtnShake = keyframes`
 `;
 
 export {
-    addBtnShake,
+  addBtnShake,
 };
