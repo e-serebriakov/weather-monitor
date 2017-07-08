@@ -86,13 +86,15 @@ const CityCard = ({ onRemove, data }) => {
     weatherDescription,
   } = data;
 
+  const bindRemove = () => onRemove(id);
+
   return (
-    <Card data-id={id}>
+    <Card>
       <CityText>{name} ({country})</CityText>
       <TemperatureText>{Math.round(temperature)} &#176;C</TemperatureText>
       <WeatherSummary>{weather}</WeatherSummary>
       <WeatherDescription>({weatherDescription})</WeatherDescription>
-      <RemoveButton onClick={onRemove} />
+      <RemoveButton onClick={bindRemove()} />
     </Card>
   );
 };
