@@ -235,11 +235,9 @@ class App extends Component {
 
   /**
    * Delete city
-   * @param event
+   * @param cityID
    */
-  deleteCityCard(event) {
-    const cityElement = event.target.closest('div');
-    const cityID = cityElement.getAttribute('data-id');
+  deleteCityCard(cityID) {
     const savedCityCollection = App.getSavedCityCollection();
     const filteredCityCollection = savedCityCollection.filter(city => {
       return parseInt(city.id, 10) !== parseInt(cityID, 10);
